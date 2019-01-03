@@ -10,7 +10,16 @@ def sort_entry_key(elem):
     return elem['start_time']
 
 class Paymo(object):
-    """A helper class to interact with the paymoapp.com API"""
+    """
+    A helper class to interact with the paymoapp.com API
+
+    Example usage:
+        p = Paymo('<your API key here'>)
+        project = 1133221
+
+        for e in p.entries(project):
+            print("{} - {} : {}".format(e['start_time'], e['end_time'], e['description]))
+    """
 
     paymo_api = 'https://app.paymoapp.com/api/'
     auth_key=''
@@ -59,6 +68,15 @@ class Paymo(object):
 import re
 
 class TimeWarriorExporter(object):
+    """
+    A helper class to export timesheet data to the TimeWarrior format
+
+    Example usage:
+        p = Paymo('<your API key here'>)
+        project = 1133221
+
+        TimeWarriorExporter(p, project).print_entries()
+    """
 
     def __init__(self, paymo, project):
         self._paymo = paymo
