@@ -47,3 +47,32 @@ class Paymo(object):
     def print_tasks(self, project):
         for t in self.tasks(project):
             print(t['id'], ":", t['name'])
+
+
+import re
+
+class TimeWarriorExporter(object):
+
+    def __init__(self, paymo, project):
+        self._paymo = paymo
+
+        self._project = "libcamera"
+        self._tasks = paymo.tasks(project)
+        self._entries = paymo.entries(project)
+
+    def print_entries(self):
+        def task_name(id):
+            return [t for t in self._tasks if t['id'] == id][0]['name']
+
+        def conv_date(d):
+            return re.sub("[:-]", "", d)
+
+        def remove_newlines(d):
+            return re.sub("\r?\n", " ", d)
+
+        for e in self._entries:
+            start = conv_date(e['start_time'])
+            end = conv_date(e['end_time'])
+            desc = remove_newlines(e['description'])
+
+            print("inc {} - {} # {} {} \" {} \"".format(start, end, self._project, task_name(e['task_id']), desc))
