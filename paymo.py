@@ -31,6 +31,13 @@ class Paymo(object):
     def me(self):
         return self.api_call('me')
 
+    def projects(self):
+        self._projects = self.api_call('projects')['projects']
+        return self._projects
+
+    def project(self, id):
+        return [p for p in self.projects() if p['id'] == id][0]
+
     def tasks(self, project):
         r = self.api_call('tasks?where=project_id=' + str(project))
         return r['tasks']
@@ -56,7 +63,9 @@ class TimeWarriorExporter(object):
     def __init__(self, paymo, project):
         self._paymo = paymo
 
-        self._project = "libcamera"
+        self._project = paymo.project(project)
+
+        self._project_name = self._project['code']
         self._tasks = paymo.tasks(project)
         self._entries = paymo.entries(project)
 
@@ -75,4 +84,4 @@ class TimeWarriorExporter(object):
             end = conv_date(e['end_time'])
             desc = remove_newlines(e['description'])
 
-            print("inc {} - {} # {} {} \" {} \"".format(start, end, self._project, task_name(e['task_id']), desc))
+            print("inc {} - {} # {} {} \" {} \"".format(start, end, self._project_name, task_name(e['task_id']), desc))
